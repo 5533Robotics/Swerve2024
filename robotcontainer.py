@@ -118,5 +118,14 @@ class RobotContainer:
         )
 
     def getAutonomousCommand(self):
-        return DriveAuton(self._drive, self.drivetrain)
+        return (
+            self.drivetrain.apply_request(
+                lambda: (
+                    self._drive.with_velocity_x(0.5)
+                    .with_velocity_y(0)
+                    .with_rotational_rate(0)
+                )
+            )
+            .withTimeout(3)
+        )
         
