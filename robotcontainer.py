@@ -9,6 +9,7 @@ import commands2.button
 import commands2.cmd
 from commands2.sysid import SysIdRoutine
 
+from autons.DriveAuton import DriveAuton
 from generated.tuner_constants import TunerConstants
 from telemetry import Telemetry
 
@@ -46,6 +47,7 @@ class RobotContainer:
         )
         self._brake = swerve.requests.SwerveDriveBrake()
         self._point = swerve.requests.PointWheelsAt()
+        self._idle = swerve.requests.Idle()
 
         self._logger = Telemetry(self._max_speed)
 
@@ -115,9 +117,6 @@ class RobotContainer:
             lambda state: self._logger.telemeterize(state)
         )
 
-    def getAutonomousCommand(self) -> commands2.Command:
-        """Use this to pass the autonomous command to the main {@link Robot} class.
-
-        :returns: the command to run in autonomous
-        """
-        return commands2.cmd.print_("No autonomous command configured")
+    def getAutonomousCommand(self):
+        return DriveAuton(self._drive, self.drivetrain)
+        
