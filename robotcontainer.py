@@ -15,7 +15,7 @@ from telemetry import Telemetry
 
 from phoenix6 import swerve
 from wpimath.geometry import Rotation2d
-from wpimath.units import rotationsToRadians
+from wpimath.units import rotationsToRadians, feetToMeters
 
 
 class RobotContainer:
@@ -117,8 +117,13 @@ class RobotContainer:
             lambda state: self._logger.telemeterize(state)
         )
 
+        self.initial_pose = self.drivetrain.get_state().pose
+
     def getAutonomousCommand(self):
-        return (
+        def seed_pose():
+            self.initial_pose = self.drivetrain.get_state().pose
+
+        return self.drivetrain.runOnce(lambda: seed_pose).andThen(
             self.drivetrain.apply_request(
                 lambda: (
                     self._drive.with_velocity_x(0.5)
@@ -126,6 +131,6 @@ class RobotContainer:
                     .with_rotational_rate(0)
                 )
             )
-            .withTimeout(3)
+            .until(lambda: abs(self.drivetrain.get_state().pose.x - self.initial_pose.x) >= feetToMeters(2))
         )
         
